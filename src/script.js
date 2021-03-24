@@ -1,10 +1,36 @@
 $(document).ready(function(){
+    var tamanhoTabuleiro = 10;
     var corpo;
     var fruta;
     var x;
     var y;
 
+    montaTabuleiro();
     iniciar();
+
+    function montaTabuleiro(){
+        let tabuleiro = document.getElementById('tabuleiro');
+        var tabela = `
+            <table border="6" class="tabuleiro">
+        `;
+        for(let linha = 0; linha < tamanhoTabuleiro; linha++){
+            tabela = tabela + `
+                <tr>
+            `;
+            for(let coluna = 0; coluna < tamanhoTabuleiro; coluna++){
+                tabela = tabela + `
+                    <td id="${linha}${coluna}"></td>
+                `;
+            }
+            tabela = tabela + `
+                </tr>
+            `;
+        }
+        tabela = tabela + `
+            </table>
+        `;
+        tabuleiro.innerHTML = tabela;
+    }
 
     function iniciar(){
         //var tabuleiro = [[00,01,02],[10,11,12],[20,21,22]];
@@ -27,9 +53,9 @@ $(document).ready(function(){
             case 38: //CIMA
                 if(y > 0){ y--; atualizar();} break;
             case 39: //DIREITA
-                if(x < 9){ x++; atualizar();} break;
+                if(x < (tamanhoTabuleiro - 1)){ x++; atualizar();} break;
             case 40: //BAIXO
-                if(y < 9){ y++; atualizar();} break;   
+                if(y < (tamanhoTabuleiro - 1)){ y++; atualizar();} break;   
         }
         
     });
