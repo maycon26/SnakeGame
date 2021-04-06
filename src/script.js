@@ -1,9 +1,17 @@
 $(document).ready(function(){
+    const LEFT = 37;
+    const UP = 38;
+    const RIGHT = 39;
+    const DOWN = 40;
     var tamanhoTabuleiro = 10;
     var corpo;
     var fruta;
     var x;
     var y;
+    var direcao;
+    var velocidade;
+    var timer;
+    var start; //Inicia e para o timer
 
     montaTabuleiro();
     iniciar();
@@ -33,43 +41,59 @@ $(document).ready(function(){
     }
 
     function iniciar(){
-        //var tabuleiro = [[00,01,02],[10,11,12],[20,21,22]];
-        //var tamanho = 2;
         corpo = ['21', '20'];
         fruta = '13';
-        console.log(corpo.length);
+        direcao = RIGHT;
+        velocidade = 500;
+        if(start == 1) window.clearInterval(timer);
+        start = 0;
         x = 1;
         y = 2;
         mostrar();
     }
 
     document.querySelector('body').addEventListener('keydown', function(event) {
-
-        var tecla = event.keyCode;
-
-        switch(tecla){
-            case 37: //ESQUERDA
-                if(x > 0){ x--; atualizar();} break;
-            case 38: //CIMA
-                if(y > 0){ y--; atualizar();} break;
-            case 39: //DIREITA
-                if(x < (tamanhoTabuleiro - 1)){ x++; atualizar();} break;
-            case 40: //BAIXO
-                if(y < (tamanhoTabuleiro - 1)){ y++; atualizar();} break;   
-        }
+        let tecla = event.keyCode;
         
+        //Se for a primeira tecla após o início, inicia o timer
+        if(start == 0){timer = window.setInterval(function(){andar(direcao)}, velocidade); start = 1;}
+
+        if(tecla != direcao) andar(event.keyCode);
     });
 
+    function andar(tecla){
+        switch(tecla){
+            case LEFT:
+                if(x > 0){
+                    if(direcao != RIGHT){x--; direcao = tecla; atualizar();}
+                }
+                else iniciar(); break;
+            case UP:
+                if(y > 0){
+                    if(direcao != DOWN){y--; direcao = tecla; atualizar();}
+                }
+                else iniciar(); break;
+            case RIGHT:
+                if(x < (tamanhoTabuleiro - 1)){
+                    if(direcao != LEFT){x++; direcao = tecla; atualizar();}
+                }
+                else iniciar(); break;
+            case DOWN:
+                if(y < (tamanhoTabuleiro - 1)){
+                    if(direcao != UP){y++; direcao = tecla; atualizar();}
+                }
+                else iniciar(); break;
+        }
+    }
+
     function atualizar(){
-        corpo.unshift(y.toString() + x.toString());
-        console.log(corpo);
+        corpo.unshift(y.toString() + x.toString()); //Atualiza o vetor do corpo
 
-        if(corpo[0] != fruta){
-            corpo.pop();
+        if(corpo[0] != fruta){ //Se não pegar a fruta
+            corpo.pop(); //Remove o final do corpo
 
-            if(corpo.filter(y => y === corpo[0]).length > 1){
-                console.log("DEU RUIM");
-                iniciar();
+            if(corpo.filter(y => y === corpo[0]).length > 1){ //Verifica colisão com o próprio corpo
+                iniciar(); //Reinicia o game
             }
         }
         else{
@@ -84,7 +108,6 @@ $(document).ready(function(){
         $(coord_fruta).css({backgroundColor: "red" });
 
         for(let i = 0; i < corpo.length; i++){
-            //console.log(corpo[i]);
             let coord = '#' + corpo[i]; //coordenada
             $(coord).css({backgroundColor: "darkgreen" });
         }
@@ -98,6 +121,8 @@ $(document).ready(function(){
             let x = Math.floor(Math.random() * 10);
             fruta = y.toString() + x.toString();
         }
+
+        velocidade *= 0.99; //velocidade aumenta 1% a cada fruta comida
     }
 
 });
